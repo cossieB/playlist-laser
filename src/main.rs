@@ -1,3 +1,7 @@
+use std::env;
+use playser::config::Config;
+
 fn main() {
-    println!("Hello, world!");
+    let args = env::args();
+    Config::new(args);
 }
