@@ -9,13 +9,25 @@ pub struct Config {
     shuffle: bool,
 }
 impl Config {
+    pub fn playlist(&self) -> &String {
+        &self.playlist
+    }
+    pub fn format(&self) -> &format::Format {
+        &self.format
+    }
+    pub fn keep_duplicates(&self) -> bool {
+        self.keep_duplicates
+    }
+    pub fn shuffle(&self) -> bool {
+        self.shuffle
+    }
     pub fn new(mut args: Args) -> Result<Config, &'static str> {
         args.next();
         let mut playlist = match args.next() {
             Some(arg) => arg,
             None => Self::get_input("Please enter the path to the playlist".to_string()),
         };
-        while !Self::file_exists(&playlist) {
+        while !crate::file_exists(&playlist) {
             playlist = Self::get_input("File not found. Please enter a valid path. \nHint on Windows right-click on the playlist file while holding shift, then select \"copy as path\"".to_string());
         }
         let format = Self::get_format(&playlist)?;
@@ -53,12 +65,7 @@ impl Config {
         }
         input.trim().to_string()
     }
-    
-    fn file_exists(path: &str) -> bool {
-        let path = path::Path::new(path);
-        path.exists()
-    }
-    
+       
     fn get_format(path: &str) -> Result<format::Format, &'static str> {
         let path = path::Path::new(path);
         let ext = path.extension();
@@ -83,11 +90,11 @@ mod tests {
 
     #[test]
     fn file_does_exist() {
-        assert!(Config::file_exists("./test.txt"))
+        assert!(crate::file_exists("./test.txt"))
     }
     #[test]
     fn file_doesnt_exist() {
-        assert!(!Config::file_exists("./fake.txt"))
+        assert!(!crate::file_exists("./fake.txt"))
     }
     #[test]
     fn format_is_m3u() {
