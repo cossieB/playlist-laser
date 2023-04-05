@@ -5,15 +5,12 @@ use crate::format;
 pub struct Config {
     playlist: String,
     format: format::Format,
-    delete_duplicates: bool,
-    preserve_order: bool,
+    keep_duplicates: bool,
+    shuffle: bool,
 }
 impl Config {
     pub fn new(mut args: Args) -> Result<Config, &'static str> {
         args.next();
-        let delete_duplicates = true;
-        let preserve_order = true;
-
         let mut playlist = match args.next() {
             Some(arg) => arg,
             None => Self::get_input("Please enter the path to the playlist".to_string()),
@@ -22,12 +19,23 @@ impl Config {
             playlist = Self::get_input("File not found. Please enter a valid path. \nHint on Windows right-click on the playlist file while holding shift, then select \"copy as path\"".to_string());
         }
         let format = Self::get_format(&playlist)?;
+        let keep_duplicates;
+        let shuffle;
+
+        if let Some(options) = args.next() {
+            keep_duplicates = options.contains('d');
+            shuffle = options.contains('s');
+        }
+        else {
+            keep_duplicates = false;
+            shuffle = false;
+        }
 
         Ok(Config {
             playlist,
             format,
-            delete_duplicates,
-            preserve_order,
+            keep_duplicates,
+            shuffle,
         })
     }
     fn get_input(prompt: String) -> String {
@@ -39,7 +47,7 @@ impl Config {
                     break;
                 }
                 Err(e) => {
-                    println!("Unable to read input. Please try again.")
+                    println!("Unable to read input. Please try again. {}", e)
                 }
             };
         }

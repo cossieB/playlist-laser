@@ -1,4 +1,4 @@
-use std::{env, os, process};
+use std::{env, process};
 use playser::config::Config;
 
 fn main() {
