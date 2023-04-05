@@ -56,7 +56,7 @@ impl Config {
         let ext = path.extension();
         
         match ext {
-            None => Err("Playlist not supported"),
+            None => Err("Unknown file format"),
             Some(os_str) => {
                 match os_str.to_str() {
                     None => Err("Error reading playlist format"),
@@ -68,3 +68,30 @@ impl Config {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::format::Format;
+    use super::*;
+
+    #[test]
+    fn file_does_exist() {
+        assert!(Config::file_exists("./test.txt"))
+    }
+    #[test]
+    fn file_doesnt_exist() {
+        assert!(!Config::file_exists("./fake.txt"))
+    }
+    #[test]
+    fn format_is_m3u() {
+        let f = Config::get_format("./test.m3u8");
+        assert!(f.is_ok());
+        assert_eq!(f.unwrap(), Format::M3U)
+    }
+    #[test]
+    fn format_unsupported() {
+        let f = Config::get_format("./test.txt");
+        println!("{:?}", f);
+        assert!(f.is_err());
+        assert_eq!(f.unwrap_err(), "Playlist format currently not supported")
+    }
+}
