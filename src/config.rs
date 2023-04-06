@@ -7,6 +7,7 @@ pub struct Config {
     format: format::Format,
     keep_duplicates: bool,
     shuffle: bool,
+    output_format: format::Format,
 }
 impl Config {
     pub fn new(mut args: Args) -> Result<Config, &'static str> {
@@ -30,12 +31,22 @@ impl Config {
             keep_duplicates = false;
             shuffle = false;
         }
+        let output_format = match args.next() {
+            Some(val) => {
+                format::Format::get_format_from_ext(&val).unwrap_or_else(|_| {
+                    println!("Unrecognized output format (3rd argument). Defaulting to original playlist format");
+                    format.clone()
+                })
+            },
+            _ => format.clone()
+        };
 
         Ok(Config {
             playlist,
             format,
             keep_duplicates,
             shuffle,
+            output_format
         })
     }
     // Getters

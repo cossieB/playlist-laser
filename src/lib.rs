@@ -1,4 +1,4 @@
-use std::path;
+use std::{path};
 pub mod config;
 pub mod format;
 
@@ -22,3 +22,4 @@ fn get_input(prompt: String) -> String {
     }
     input.trim().to_string()
 }
+
