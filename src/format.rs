@@ -32,7 +32,7 @@ impl Format {
     }
     pub fn get_extension(format: &Self) -> String {
         match format {
-            Format::M3U => ".m3u8".to_string(),
+            Format::M3U => "m3u8".to_string(),
         }
     }
 }
@@ -53,13 +53,15 @@ pub trait PlaylistReaderWriter {
     }
 }
 
-fn get_filename(path: &str) -> &str {
-    for (i, char) in path.chars().rev().enumerate() {
-        if char == '.' {
-            return &path[0..i];
-        }
-    }
-    &path
+fn get_filename(path: &str) -> String {
+    let re = regex::Regex::new(r"(^(?:\.(?:/|\\))?[^\.]+)(?:\.\w+)?$").unwrap();
+    extract_regex(path, re).unwrap_or("playser_generated".to_owned())
+}
+
+fn extract_regex(text: &str, re: regex::Regex) -> Option<String> {
+    let captures = re.captures(text)?; 
+    let mtch = captures.get(1)?;
+    Some(String::from(&text[0..mtch.end()]))
 }
 
 #[cfg(test)]
@@ -70,8 +72,10 @@ mod tests {
     fn filename_tests() {
         assert_eq!(get_filename("hello.txt"), "hello");
         assert_eq!(get_filename("h3ll0.mp3"), "h3ll0");
-        assert_eq!(get_filename(".txt"), "");
+        assert_eq!(get_filename(".txt"), "playser_generated");
         assert_eq!(get_filename("hello"), "hello");
-        assert_eq!(get_filename("hello..txt"), "hello")
+        assert_eq!(get_filename("hello..txt"), "playser_generated");
+        assert_eq!(get_filename("./hello.txt"), "./hello");
+        assert_eq!(get_filename(".\\hello.txt"), ".\\hello");
     }
 }

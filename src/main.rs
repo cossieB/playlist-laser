@@ -5,13 +5,13 @@ use playser::{
 
 use std::{env, process};
 
-fn main() {    
+fn main() {
+   
     let args = env::args();
     let config = config::Config::new(args).unwrap_or_else(|err| {
         println!("{err}");
         process::exit(1)
     });
-    println!("{:#?}", config);
     let reader_writer: Box<dyn PlaylistReaderWriter> = match &config.format() {
         format::Format::M3U => Box::new(format::M3UReaderWriter),
     };
@@ -21,3 +21,4 @@ fn main() {
         process::exit(1)
     })
 }
+
