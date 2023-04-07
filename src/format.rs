@@ -39,7 +39,7 @@ impl Format {
 
 pub trait PlaylistReaderWriter {
     fn parse_file(&self, config: &config::Config) -> Vec<String>;
-    fn write_file(&self, files: &Vec<String>, config: &config::Config) -> Result<(), &'static str> ;
+    fn write_file(&self, files: &Vec<String>, config: &config::Config) -> Result<String, &'static str> ;
     
     fn generate_new_filename(&self, config: &config::Config) -> String {
         let name = get_filename(config.playlist());
