@@ -1,4 +1,4 @@
-use playser::{
+use playzer::{
     config,
     format::{self, PlaylistReaderWriter},
 };

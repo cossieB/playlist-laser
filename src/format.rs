@@ -55,7 +55,7 @@ pub trait PlaylistReaderWriter {
 
 fn get_filename(path: &str) -> String {
     let re = regex::Regex::new(r"(^(?:\.(?:/|\\))?[^\.]+)(?:\.\w+)?$").unwrap();
-    extract_regex(path, re).unwrap_or("playser_generated".to_owned())
+    extract_regex(path, re).unwrap_or("playzer_generated".to_owned())
 }
 
 fn extract_regex(text: &str, re: regex::Regex) -> Option<String> {
@@ -72,9 +72,9 @@ mod tests {
     fn filename_tests() {
         assert_eq!(get_filename("hello.txt"), "hello");
         assert_eq!(get_filename("h3ll0.mp3"), "h3ll0");
-        assert_eq!(get_filename(".txt"), "playser_generated");
+        assert_eq!(get_filename(".txt"), "playzer_generated");
         assert_eq!(get_filename("hello"), "hello");
-        assert_eq!(get_filename("hello..txt"), "playser_generated");
+        assert_eq!(get_filename("hello..txt"), "playzer_generated");
         assert_eq!(get_filename("./hello.txt"), "./hello");
         assert_eq!(get_filename(".\\hello.txt"), ".\\hello");
     }
