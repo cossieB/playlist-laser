@@ -7,7 +7,7 @@ pub struct Config {
     format: format::Format,
     keep_duplicates: bool,
     shuffle: bool,
-    // output_format: format::Format,
+    output_format: format::Format,
 }
 impl Config {
     pub fn new(mut args: Args) -> Result<Config, &'static str> {
@@ -20,33 +20,32 @@ impl Config {
             playlist = super::get_input("File not found. Please enter a valid path. \nHint on Windows right-click on the playlist file while holding shift, then select \"copy as path\"".to_string());
         }
         let format = format::Format::get_format(&playlist)?;
-        let keep_duplicates;
-        let shuffle;
 
-        if let Some(options) = args.next() {
-            keep_duplicates = options.contains('d');
-            shuffle = options.contains('s');
-        }
-        else {
-            keep_duplicates = false;
-            shuffle = false;
-        }
-        // let output_format = match args.next() {
-        //     Some(val) => {
-        //         format::Format::get_format_from_ext(&val).unwrap_or_else(|_| {
-        //             println!("Unrecognized output format (3rd argument). Defaulting to original playlist format");
-        //             format.clone()
-        //         })
-        //     },
-        //     _ => format.clone()
-        // };
+        let output_format = match args.next() {
+            Some(val) => {
+                format::Format::get_format_from_ext(&val).unwrap_or_else(|_| {
+                    println!("Unrecognized output format (2nd argument). Defaulting to original playlist format");
+                    format.clone()
+                })
+            },
+            None => format.clone()
+        };
+        let options = args.next();
+        let keep_duplicates = match &options {
+            None => false,
+            Some(opt) => opt.contains('d')
+        };
+        let shuffle = match &options {
+            None => false,
+            Some(opt) => opt.contains('s')
+        };
 
         Ok(Config {
             playlist,
             format,
             keep_duplicates,
             shuffle,
-            // output_format
+            output_format
         })
     }
     // Getters
@@ -61,6 +60,9 @@ impl Config {
     }
     pub fn shuffle(&self) -> bool {
         self.shuffle
+    }
+    pub fn output_format(&self) -> &format::Format {
+        &self.output_format
     }
 }
 

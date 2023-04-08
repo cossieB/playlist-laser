@@ -53,7 +53,7 @@ pub trait PlaylistReaderWriter {
     
     fn generate_new_filename(&self, config: &config::Config) -> String {
         let name = get_filename(config.playlist());
-        let extension = Format::get_extension(config.format());
+        let extension = Format::get_extension(config.output_format());
         let mut rng = rand::thread_rng(); //random number to prevent filename clashes.
         let mut path = format!("{name} CLEANED {}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
         while file_exists(&path) {
@@ -70,7 +70,13 @@ pub trait PlaylistReaderWriter {
         }
     }
 }
-
+pub fn get_reader_writer(format: &Format) -> Box<dyn PlaylistReaderWriter> {
+    match format {
+        Format::M3U => Box::new(M3UReaderWriter),
+        Format::PLS => Box::new(PlsReaderWriter),
+        Format::ASX => Box::new(ASXReaderWriter)
+    }
+}
 fn get_filename(path: &str) -> String {
     let re = regex::Regex::new(r"(^(?:\.(?:/|\\))?[^\.]+)(?:\.\w+)?$").unwrap();
     extract_regex(path, &re).unwrap_or("playzer_generated".to_owned())

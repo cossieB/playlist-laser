@@ -1,12 +1,11 @@
 use playzer::{
     config,
-    format::{self, PlaylistReaderWriter},
+    format
 };
 
-use std::{env, process, io};
+use std::{env, io, process};
 
 fn main() {
-   
     let mut buf = String::new();
     let args = env::args();
     let config = config::Config::new(args).unwrap_or_else(|err| {
@@ -14,13 +13,10 @@ fn main() {
         io::stdin().read_line(&mut buf).unwrap();
         process::exit(1)
     });
-    let reader_writer: Box<dyn PlaylistReaderWriter> = match &config.format() {
-        format::Format::M3U => Box::new(format::M3UReaderWriter),
-        format::Format::PLS => Box::new(format::PlsReaderWriter),
-        format::Format::ASX => Box::new(format::ASXReaderWriter)
-    };
-    let v = reader_writer.parse_file(&config);
-    let path = reader_writer.write_file(&v, &config).unwrap_or_else(|err| {
+    let reader = format::get_reader_writer(&config.format());
+    let writer = format::get_reader_writer(&config.output_format());
+    let v = reader.parse_file(&config);
+    let path = writer.write_file(&v, &config).unwrap_or_else(|err| {
         println!("{err}. Press any 'Enter' to quit.");
         io::stdin().read_line(&mut buf).unwrap();
         process::exit(1)
@@ -28,4 +24,3 @@ fn main() {
     println!("Done. Playlist saved as \"{path}\". Press \"Enter\" to exit.");
     io::stdin().read_line(&mut buf).unwrap();
 }
-

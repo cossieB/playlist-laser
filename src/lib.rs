@@ -22,4 +22,3 @@ fn get_input(prompt: String) -> String {
     }
     input.trim().replace("\"", "").to_string()
 }
-
