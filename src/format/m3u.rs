@@ -17,12 +17,7 @@ impl PlaylistReaderWriter for M3UReaderWriter {
             if config.keep_duplicates() == false && set.contains(line) {
                 continue;
             }
-            if crate::file_exists(line) {
-                if config.keep_duplicates() == false {
-                    set.insert(line.to_string());
-                }
-                list.push(line.to_string());
-            }
+            self.add_files_to_list(config, &mut set, line, &mut list);
         }
         list
     }
@@ -38,4 +33,9 @@ impl PlaylistReaderWriter for M3UReaderWriter {
         };
         Ok(path)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    
 }

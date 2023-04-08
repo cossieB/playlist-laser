@@ -1,7 +1,7 @@
 use std::{env::Args};
 use crate::format;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Config {
     playlist: String,
     format: format::Format,

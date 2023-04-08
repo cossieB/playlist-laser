@@ -1,12 +1,15 @@
-use std::path;
+use std::{path, collections::HashSet};
 
 use crate::{config, file_exists};
 mod m3u;
-pub use m3u::M3UReaderWriter;
+mod pls;
+pub use m3u::M3UReaderWriter; 
+pub use pls::PlsReaderWriter;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Format {
     M3U,
+    PLS
 }
 
 impl Format {
@@ -27,12 +30,14 @@ impl Format {
     pub fn get_format_from_ext(ext: &str) -> Result<Self, &'static str> {
         match ext.to_lowercase().as_str() {
             "m3u" | "m3u8" => Ok(Self::M3U),
+            "pls" => Ok(Self::PLS),
             _ => Err("Playlist format currently not supported")
         }
     }
     pub fn get_extension(format: &Self) -> String {
         match format {
             Format::M3U => "m3u8".to_string(),
+            Format::PLS => "pls".to_string()
         }
     }
 }
@@ -50,6 +55,14 @@ pub trait PlaylistReaderWriter {
             path = format!("{name} CLEANED {}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
         }
         path
+    }
+    fn add_files_to_list(&self, config: &config::Config, set: &mut HashSet<String>, path: &str, list: &mut Vec<String>) {
+        if crate::file_exists(path) {
+            if config.keep_duplicates() == false {
+                set.insert(path.to_string());
+            }
+            list.push(path.to_string());
+        }
     }
 }
 

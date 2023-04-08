@@ -16,6 +16,7 @@ fn main() {
     });
     let reader_writer: Box<dyn PlaylistReaderWriter> = match &config.format() {
         format::Format::M3U => Box::new(format::M3UReaderWriter),
+        format::Format::PLS => Box::new(format::PlsReaderWriter)
     };
     let v = reader_writer.parse_file(&config);
     let path = reader_writer.write_file(&v, &config).unwrap_or_else(|err| {
