@@ -20,11 +20,19 @@ impl PlaylistReaderWriter for ASXReaderWriter {
                 self.add_files_to_list(config, &mut set, &path, &mut list);
             }
         }
-        println!("{}", list.len());
         list
     }
 
     fn write_file(&self, files: &Vec<String>, config: &config::Config) -> Result<String, &'static str> {
-        todo!()
+        let path = self.generate_new_filename(&config);
+        let mut contents = String::from("<ASX version = \"3.0\">\n");
+        files.iter().for_each(|file| {
+            contents.push_str(&format!("<Entry><Ref href = \"{file}\"/></Entry>\n"));
+        });
+        contents.push_str("</ASX>");
+        if let Err(_) = fs::write(&path, contents) {
+            return Err("Unable to write to file");
+        };
+        Ok(path)
     }
 }
