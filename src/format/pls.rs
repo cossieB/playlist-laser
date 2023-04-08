@@ -29,11 +29,18 @@ impl PlaylistReaderWriter for PlsReaderWriter {
                 self.add_files_to_list(config, &mut set, &path, &mut list);
             }
         }
-        println!("{:#?}", list);
         list
     }
 
     fn write_file(&self, files: &Vec<String>, config: &config::Config) -> Result<String, &'static str>  {
-        todo!()
+        let path = self.generate_new_filename(&config);
+        let mut contents = String::from("[playlist]\n");
+        for (i, file) in files.iter().enumerate() {
+            contents.push_str(&format!("File{}={file}\n", i+1));
+        };
+        if let Err(_) = fs::write(&path, contents) {
+            return Err("Unable to write to file");
+        };
+        Ok(path)
     }
 }
