@@ -3,13 +3,16 @@ use std::{path, collections::HashSet};
 use crate::{config, file_exists};
 mod m3u;
 mod pls;
+mod asx;
 pub use m3u::M3UReaderWriter; 
 pub use pls::PlsReaderWriter;
+pub use asx::ASXReaderWriter;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Format {
     M3U,
-    PLS
+    PLS,
+    ASX
 }
 
 impl Format {
@@ -31,13 +34,15 @@ impl Format {
         match ext.to_lowercase().as_str() {
             "m3u" | "m3u8" => Ok(Self::M3U),
             "pls" => Ok(Self::PLS),
+            "asx" => Ok(Self::ASX),
             _ => Err("Playlist format currently not supported")
         }
     }
     pub fn get_extension(format: &Self) -> String {
         match format {
             Format::M3U => "m3u8".to_string(),
-            Format::PLS => "pls".to_string()
+            Format::PLS => "pls".to_string(),
+            Format::ASX => "asx".to_string(),
         }
     }
 }
@@ -68,13 +73,13 @@ pub trait PlaylistReaderWriter {
 
 fn get_filename(path: &str) -> String {
     let re = regex::Regex::new(r"(^(?:\.(?:/|\\))?[^\.]+)(?:\.\w+)?$").unwrap();
-    extract_regex(path, re).unwrap_or("playzer_generated".to_owned())
+    extract_regex(path, &re).unwrap_or("playzer_generated".to_owned())
 }
 
-fn extract_regex(text: &str, re: regex::Regex) -> Option<String> {
-    let captures = re.captures(text)?; 
+fn extract_regex(text: &str, re: &regex::Regex) -> Option<String> {
+    let captures = re.captures(text)?;
     let mtch = captures.get(1)?;
-    Some(String::from(&text[0..mtch.end()]))
+    Some(String::from(&text[mtch.start()..mtch.end()]))
 }
 
 #[cfg(test)]

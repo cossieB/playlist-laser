@@ -9,8 +9,8 @@ pub struct PlsReaderWriter;
 
 impl PlsReaderWriter {
     fn parse_line(&self, line: &str) -> Option<String> {
-        let index_of_equals = line.find('=')?;
-        let path = &line.get(index_of_equals + 1..)?;
+        let equalsign_index = line.find('=')?;
+        let path = &line.get(equalsign_index + 1..)?;
         Some(path.to_string())
     }
 }
