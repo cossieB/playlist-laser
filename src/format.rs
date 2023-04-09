@@ -91,7 +91,19 @@ fn extract_regex(text: &str, re: &regex::Regex) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    #[test]
+    fn format_is_m3u() {
+        let f = Format::get_format("./test.m3u8");
+        assert!(f.is_ok());
+        assert_eq!(f.unwrap(), Format::M3U)
+    }
+    #[test]
+    fn format_unsupported() {
+        let f = Format::get_format("./test_assets/test.txt");
+        println!("{:?}", f);
+        assert!(f.is_err());
+        assert_eq!(f.unwrap_err(), "Playlist format currently not supported")
+    }
     #[test]
     fn filename_tests() {
         assert_eq!(get_filename("hello.txt"), "hello");

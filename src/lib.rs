@@ -22,3 +22,16 @@ fn get_input(prompt: String) -> String {
     }
     input.trim().replace("\"", "").to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn file_does_exist() {
+        assert!(file_exists("./test_assets/test.txt"))
+    }
+    #[test]
+    fn file_doesnt_exist() {
+        assert!(!file_exists("./fake.txt"))
+    }
+}

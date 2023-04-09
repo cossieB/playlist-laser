@@ -1,4 +1,3 @@
-use std::{env::Args};
 use crate::format;
 
 #[derive(Debug, PartialEq)]
@@ -10,8 +9,8 @@ pub struct Config {
     output_format: format::Format,
 }
 impl Config {
-    pub fn new(mut args: Args) -> Result<Config, &'static str> {
-        args.next();
+    pub fn new(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
+        let tst = args.next(); println!("{:#?}", &tst.unwrap());
         let mut playlist = match args.next() {
             Some(arg) => arg,
             None => super::get_input("Please enter the path to the playlist".to_string()),
@@ -69,26 +68,38 @@ impl Config {
 #[cfg(test)]
 mod tests {
     use crate::format::Format;
+    use super::*;
 
     #[test]
-    fn file_does_exist() {
-        assert!(crate::file_exists("./test.txt"))
+    fn valid_config_1() {
+        let config = Config::new(["".to_string(),"./test_assets/test.m3u8".to_string(), ".".to_string(), "s".to_string()].into_iter()).unwrap();
+        assert_eq!(*config.format(), Format::M3U);
+        assert_eq!(*config.output_format(), Format::M3U);
+        assert_eq!(config.shuffle(), true);
+        assert_eq!(config.keep_duplicates(), false);
     }
     #[test]
-    fn file_doesnt_exist() {
-        assert!(!crate::file_exists("./fake.txt"))
+    fn valid_config_2() {
+        let config = Config::new(["".to_string(),"./test_assets/test.pls".to_string(), "m3u".to_string(), "d".to_string()].into_iter()).unwrap();
+        assert_eq!(*config.format(), Format::PLS);
+        assert_eq!(*config.output_format(), Format::M3U);
+        assert_eq!(config.shuffle(), false);
+        assert_eq!(config.keep_duplicates(), true);
     }
     #[test]
-    fn format_is_m3u() {
-        let f = Format::get_format("./test.m3u8");
-        assert!(f.is_ok());
-        assert_eq!(f.unwrap(), Format::M3U)
+    fn valid_config_3() {
+        let config = Config::new(["".to_string(),"./test_assets/test.asx".to_string(), "pls".to_string()].into_iter()).unwrap();
+        assert_eq!(*config.format(), Format::ASX);
+        assert_eq!(*config.output_format(), Format::PLS);
+        assert_eq!(config.shuffle(), false);
+        assert_eq!(config.keep_duplicates(), false);
     }
     #[test]
-    fn format_unsupported() {
-        let f = Format::get_format("./test.txt");
-        println!("{:?}", f);
-        assert!(f.is_err());
-        assert_eq!(f.unwrap_err(), "Playlist format currently not supported")
+    fn valid_config_4() {
+        let config = Config::new(["".to_string(),"./test_assets/test.m3u8".to_string(), "asx".to_string(), "ds".to_string()].into_iter()).unwrap();
+        assert_eq!(*config.format(), Format::M3U);
+        assert_eq!(*config.output_format(), Format::ASX);
+        assert_eq!(config.shuffle(), true);
+        assert_eq!(config.keep_duplicates(), true);
     }
 }

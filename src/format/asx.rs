@@ -36,3 +36,22 @@ impl PlaylistReaderWriter for ASXReaderWriter {
         Ok(path)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn no_duplicates() {
+        let config = crate::config::Config::new(["".to_string(),"./test_assets/test.asx".to_string(), "m3u".to_string()].into_iter()).unwrap();
+        let mock = ASXReaderWriter;
+        let v = mock.parse_file(&config);
+        assert_eq!(v, vec!["./test_assets/test.txt".to_string()])
+    }
+    #[test]
+    fn yes_duplicates() {
+        let config = crate::config::Config::new(["".to_string(),"./test_assets/test.asx".to_string(), "m3u".to_string(), "d".to_string()].into_iter()).unwrap();
+        let mock = ASXReaderWriter;
+        let v = mock.parse_file(&config);
+        assert_eq!(v, vec!["./test_assets/test.txt".to_string(), "./test_assets/test.txt".to_string()])
+    }
+}

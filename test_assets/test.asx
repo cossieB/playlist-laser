@@ -1,0 +1,5 @@
+﻿<ASX version = "3.0">
+<Entry><Ref href = "./test_assets/test.txt"/></Entry>
+<Entry><Ref href = "C:\Users\me\Music\Rick Astley\Whenever You Need Somebody\Rick Astley - Never Gonna Give You Up.mp3"/></Entry>
+<Entry><Ref href = "./test_assets/test.txt"/></Entry>
+</ASX>
