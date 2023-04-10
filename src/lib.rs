@@ -22,6 +22,16 @@ fn get_input(prompt: String) -> String {
     }
     input.trim().replace("\"", "").to_string()
 }
+fn shuffle<T: Clone>(arr: &mut Vec<T>) {
+    use rand::Rng;
+    let mut i = arr.len() - 1;
+    while i > 0 {
+        let mut rng = rand::thread_rng();
+        let j = rng.gen_range(0..i);
+        ( arr[i], arr[j] ) = ( arr[j].clone(), arr[i].clone() );
+        i -= 1;
+    };
+}
 
 #[cfg(test)]
 mod tests {

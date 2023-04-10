@@ -54,8 +54,9 @@ pub trait PlaylistReaderWriter {
     fn generate_new_filename(&self, config: &config::Config) -> String {
         let name = get_filename(config.playlist());
         let extension = Format::get_extension(config.output_format());
-        let mut rng = rand::thread_rng(); //random number to prevent filename clashes.
+        let mut rng = rand::thread_rng(); //random number to reduce chance of filename clash.
         let mut path = format!("{name} CLEANED {}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
+        // make sure no file exists at the path
         while file_exists(&path) {
             path = format!("{name} CLEANED {}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
         }
@@ -69,6 +70,13 @@ pub trait PlaylistReaderWriter {
             list.push(path.to_string());
         }
     }
+    fn read_file(&self, config: &config::Config) -> Vec<String> {
+        let mut v = self.parse_file(&config);
+        if config.shuffle() {
+            crate::shuffle(&mut v);
+        }
+        v
+    }
 }
 pub fn get_reader_writer(format: &Format) -> Box<dyn PlaylistReaderWriter> {
     match format {
@@ -78,7 +86,7 @@ pub fn get_reader_writer(format: &Format) -> Box<dyn PlaylistReaderWriter> {
     }
 }
 fn get_filename(path: &str) -> String {
-    let re = regex::Regex::new(r"(^(?:\.(?:/|\\))?[^\.]+)(?:\.\w+)?$").unwrap();
+    let re = regex::Regex::new(r"(^(?:\.(?:/|\\))?[^\.]+)(?:\.\w+)?$").unwrap(); //see tests filename_tests() below to figure out what this regex does
     extract_regex(path, &re).unwrap_or("playzer_generated".to_owned())
 }
 
