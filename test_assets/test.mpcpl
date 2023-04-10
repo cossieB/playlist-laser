@@ -1,0 +1,9 @@
+MPCPLAYLIST
+audio,-1
+subtitles,-1
+1,type,0
+1,filename,./test_assets/test.txt
+2,type,0
+2,filename,C:\Users\me\Music\Rick Astley\Whenever You Need Somebody\Rick Astley - Never Gonna Give You Up.mp3
+3,type,0
+3,filename,./test_assets/test.txt

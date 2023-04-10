@@ -4,15 +4,18 @@ use crate::{config, file_exists};
 mod m3u;
 mod pls;
 mod asx;
+mod mpcpl;
 pub use m3u::M3UReaderWriter; 
-pub use pls::PlsReaderWriter;
+pub use pls::PLSReaderWriter;
 pub use asx::ASXReaderWriter;
+pub use mpcpl::MPCPLReaderWriter;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Format {
     M3U,
     PLS,
-    ASX
+    ASX,
+    MPCPL
 }
 
 impl Format {
@@ -35,6 +38,7 @@ impl Format {
             "m3u" | "m3u8" => Ok(Self::M3U),
             "pls" => Ok(Self::PLS),
             "asx" => Ok(Self::ASX),
+            "mpcpl" => Ok(Self::MPCPL),
             _ => Err("Playlist format currently not supported")
         }
     }
@@ -43,6 +47,7 @@ impl Format {
             Format::M3U => "m3u8".to_string(),
             Format::PLS => "pls".to_string(),
             Format::ASX => "asx".to_string(),
+            Format::MPCPL => "mpcpl".to_string(),
         }
     }
 }
@@ -81,8 +86,9 @@ pub trait PlaylistReaderWriter {
 pub fn get_reader_writer(format: &Format) -> Box<dyn PlaylistReaderWriter> {
     match format {
         Format::M3U => Box::new(M3UReaderWriter),
-        Format::PLS => Box::new(PlsReaderWriter),
-        Format::ASX => Box::new(ASXReaderWriter)
+        Format::PLS => Box::new(PLSReaderWriter),
+        Format::ASX => Box::new(ASXReaderWriter),
+        Format::MPCPL => Box::new(MPCPLReaderWriter),
     }
 }
 fn get_filename(path: &str) -> String {
