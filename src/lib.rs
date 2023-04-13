@@ -1,6 +1,7 @@
 use std::{path};
 pub mod config;
 pub mod format;
+pub mod include;
 
 fn file_exists(path: &str) -> bool {
     let path = path::Path::new(path);

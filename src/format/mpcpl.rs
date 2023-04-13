@@ -10,7 +10,7 @@ use std::{
 pub struct MPCPLReaderWriter;
 
 impl PlaylistReaderWriter for MPCPLReaderWriter {
-    fn parse_file(&self, config: &config::Config) -> Vec<String> {
+    fn parse_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>) {
         let mut set = HashSet::new();
         let file = fs::read_to_string(config.playlist()).expect("Error while reading playlist");
         let mut list = Vec::with_capacity(1000);
@@ -23,7 +23,7 @@ impl PlaylistReaderWriter for MPCPLReaderWriter {
                 self.add_files_to_list(config, &mut set, &path, &mut list);
             }
         }
-        list
+        (list, set)
     }
     fn write_file(&self, files: &Vec<String>, config: &config::Config) -> Result<String, &'static str> {
         let path = self.generate_new_filename(&config);
@@ -46,14 +46,14 @@ mod tests {
     fn no_duplicates() {
         let config = crate::config::Config::new(["".to_string(),"./test_assets/test.mpcpl".to_string(), "m3u".to_string()].into_iter()).unwrap();
         let mock = MPCPLReaderWriter;
-        let v = mock.parse_file(&config);
+        let v = mock.parse_file(&config).0;
         assert_eq!(v, vec!["./test_assets/test.txt".to_string()])
     }
     #[test]
     fn yes_duplicates() {
         let config = crate::config::Config::new(["".to_string(),"./test_assets/test.mpcpl".to_string(), "m3u".to_string(), "d".to_string()].into_iter()).unwrap();
         let mock = MPCPLReaderWriter;
-        let v = mock.parse_file(&config);
+        let v = mock.parse_file(&config).0;
         assert_eq!(v, vec!["./test_assets/test.txt".to_string(), "./test_assets/test.txt".to_string()])
     }
 }

@@ -1,7 +1,4 @@
-use playzer::{
-    config,
-    format
-};
+use playzer::{config, format, include};
 
 use std::{env, io, process};
 
@@ -14,9 +11,11 @@ fn main() {
         process::exit(1)
     });
     let reader = format::get_reader_writer(&config.format());
-    let v = reader.read_file(&config);
+    let (mut playlist, set) = reader.read_file(&config);
     let writer = format::get_reader_writer(&config.output_format());
-    let path = writer.write_file(&v, &config).unwrap_or_else(|err| {
+    
+    include::run(&config, &set, &mut playlist);
+    let path = writer.write_file(&playlist, &config).unwrap_or_else(|err| {
         println!("{err}. Press any 'Enter' to quit.");
         io::stdin().read_line(&mut buf).unwrap();
         process::exit(1)
@@ -24,3 +23,4 @@ fn main() {
     println!("Done. Playlist saved as \"{path}\". Press \"Enter\" to exit.");
     io::stdin().read_line(&mut buf).unwrap();
 }
+

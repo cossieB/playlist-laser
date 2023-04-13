@@ -1,3 +1,5 @@
+use std::{collections::HashSet};
+
 use crate::format;
 
 #[derive(Debug, PartialEq)]
@@ -7,6 +9,7 @@ pub struct Config {
     keep_duplicates: bool,
     shuffle: bool,
     output_format: format::Format,
+    other_directories: HashSet<String>
 }
 impl Config {
     pub fn new(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
@@ -38,13 +41,18 @@ impl Config {
             None => false,
             Some(opt) => opt.contains('s')
         };
+        let mut other_directories = HashSet::new();
+        while let Some(dir) = args.next() {
+            other_directories.insert(dir);
+        }
 
         Ok(Config {
             playlist,
             format,
             keep_duplicates,
             shuffle,
-            output_format
+            output_format,
+            other_directories
         })
     }
     // Getters
@@ -62,6 +70,9 @@ impl Config {
     }
     pub fn output_format(&self) -> &format::Format {
         &self.output_format
+    }
+    pub fn other_directories(&self) -> &HashSet<String> {
+        &self.other_directories
     }
 }
 

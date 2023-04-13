@@ -53,7 +53,7 @@ impl Format {
 }
 
 pub trait PlaylistReaderWriter {
-    fn parse_file(&self, config: &config::Config) -> Vec<String>;
+    fn parse_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>);
     fn write_file(&self, files: &Vec<String>, config: &config::Config) -> Result<String, &'static str> ;
     
     fn generate_new_filename(&self, config: &config::Config) -> String {
@@ -75,12 +75,12 @@ pub trait PlaylistReaderWriter {
             list.push(path.to_string());
         }
     }
-    fn read_file(&self, config: &config::Config) -> Vec<String> {
-        let mut v = self.parse_file(&config);
+    fn read_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>) {
+        let (mut v, set) = self.parse_file(&config);
         if config.shuffle() {
             crate::shuffle(&mut v);
         }
-        v
+        (v, set)
     }
 }
 pub fn get_reader_writer(format: &Format) -> Box<dyn PlaylistReaderWriter> {
