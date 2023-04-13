@@ -7,7 +7,7 @@ use std::{collections::HashSet, fs};
 pub struct ASXReaderWriter;
 
 impl PlaylistReaderWriter for ASXReaderWriter {
-    fn parse_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>){
+    fn read_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>){
         let mut set = HashSet::new();
         let file = fs::read_to_string(config.playlist()).expect("Error while reading playlist");
         let mut list = Vec::with_capacity(1000);
@@ -44,14 +44,14 @@ mod tests {
     fn no_duplicates() {
         let config = crate::config::Config::new(["".to_string(),"./test_assets/test.asx".to_string(), "m3u".to_string()].into_iter()).unwrap();
         let mock = ASXReaderWriter;
-        let v = mock.parse_file(&config).0;
+        let v = mock.read_file(&config).0;
         assert_eq!(v, vec!["./test_assets/test.txt".to_string()])
     }
     #[test]
     fn yes_duplicates() {
         let config = crate::config::Config::new(["".to_string(),"./test_assets/test.asx".to_string(), "m3u".to_string(), "d".to_string()].into_iter()).unwrap();
         let mock = ASXReaderWriter;
-        let v = mock.parse_file(&config).0;
+        let v = mock.read_file(&config).0;
         assert_eq!(v, vec!["./test_assets/test.txt".to_string(), "./test_assets/test.txt".to_string()])
     }
 }

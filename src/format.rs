@@ -53,17 +53,23 @@ impl Format {
 }
 
 pub trait PlaylistReaderWriter {
-    fn parse_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>);
+    fn read_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>);
     fn write_file(&self, files: &Vec<String>, config: &config::Config) -> Result<String, &'static str> ;
     
+    fn write(&self, files: &mut Vec<String>, config: &config::Config) -> Result<String, &'static str> {
+        if config.shuffle() {
+            crate::shuffle(files);
+        };
+        self.write_file(files, config)
+    }   
     fn generate_new_filename(&self, config: &config::Config) -> String {
         let name = get_filename(config.playlist());
         let extension = Format::get_extension(config.output_format());
         let mut rng = rand::thread_rng(); //random number to reduce chance of filename clash.
-        let mut path = format!("{name} CLEANED {}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
+        let mut path = format!("{name}_PLAYZER_{}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
         // make sure no file exists at the path
         while file_exists(&path) {
-            path = format!("{name} CLEANED {}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
+            path = format!("{name}_PLAYZER_{}.{extension}", rand::Rng::gen_range(&mut rng, 1000..99999));
         }
         path
     }
@@ -74,13 +80,6 @@ pub trait PlaylistReaderWriter {
             }
             list.push(path.to_string());
         }
-    }
-    fn read_file(&self, config: &config::Config) -> (Vec<String>, HashSet<String>) {
-        let (mut v, set) = self.parse_file(&config);
-        if config.shuffle() {
-            crate::shuffle(&mut v);
-        }
-        (v, set)
     }
 }
 pub fn get_reader_writer(format: &Format) -> Box<dyn PlaylistReaderWriter> {

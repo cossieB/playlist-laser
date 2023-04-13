@@ -15,7 +15,7 @@ fn main() {
     let writer = format::get_reader_writer(&config.output_format());
     
     include::run(&config, &set, &mut playlist);
-    let path = writer.write_file(&playlist, &config).unwrap_or_else(|err| {
+    let path = writer.write(&mut playlist, &config).unwrap_or_else(|err| {
         println!("{err}. Press any 'Enter' to quit.");
         io::stdin().read_line(&mut buf).unwrap();
         process::exit(1)
